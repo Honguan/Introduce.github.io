@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>角色扮演遊戲</title>
+    <style>
+        canvas {
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas" width="800" height="600"></canvas>
+    <script>
+        // 創建 Canvas 畫布
+        var canvas = document.getElementById('canvas');
+        var context = canvas.getContext('2d');
+
+        // 創建角色人物
+        var player = {
+            x: canvas.width/2,
+            y: canvas.height/2,
+            speed: 5,
+            stamina: 100,
+            health: 100,
+            color: '#f00'
+        };
+
+        // 創建攻擊波
+        var bullets = [];
+
+        // 每秒更新遊戲畫面
+        setInterval(update, 1000/60);
+
+        // 滑鼠點擊事件
+        canvas.addEventListener('mousedown', function(event) {
+            var bullet = {
+                x: player.x,
+                y: player.y,
+                dx: event.pageX - canvas.offsetLeft - player.x,
+                dy: event.pageY - canvas.offsetTop - player.y,
+                width: 10,
+                height: 10,
+                color: '#0f0'
+            };
+            bullets.push(bullet);
+        });
+
+        // 鍵盤按鍵事件
+        document.addEventListener('keydown', function(event) {
+            if (event.keyCode === 32 && player.stamina >= 10) {
+                player.stamina -= 10;
+                player.speed = 10;
+            } else if (event.keyCode === 16) {
+                player.color = '#00f';
+            }
+        });
+
+        // 鍵盤抬起事件
+        document.addEventListener('keyup', function(event) {
+            if (event.keyCode === 16) {
+                player.color = '#f00';
+            }
+        });
+
+        // 更新遊戲畫面
+        function update() {
+            // 更新場景
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            context.fillStyle = '#ccc';
+            context.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 更新角色人物
+            if (player.stamina < 100) {
+                player.stamina += 1;
+            }
+            if (player.speed !== 5) {
+                player.speed = Math.max(player.speed-0.5, 5);
+            }
+            context.fillStyle = player.color;
+            context.fillRect(player.x, player.y, 50, 50);
+
+            // 更新攻擊波
+            for (var i = 0; i < bullets.length; ) {
+                var bullet = bullets[i];
+                bullet.x += bullet.dx / 10;
+                bullet.y += bullet.dy / 10;
+                context.fillStyle = bullet.color;
+                context.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+                if (bullet.x < 0 || bullet.x > canvas.width || bullet.y < 0 || bullet.y > canvas.height) {
+                    bullets.splice(i, 1);
+                } else {
+                    i++;
+                }
+            }
+
+            // 更新體力條和生命條
+            context.fillStyle = '#0f0';
+            context.fillRect(10, 10, player.stamina, 10);
+            context.fillStyle = '#f00';
+            context.fillRect(10, 30, player.health, 10);
+        }
+    </script>
+</body>
+</html>
+```
